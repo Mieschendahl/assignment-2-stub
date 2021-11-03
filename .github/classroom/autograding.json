@@ -5,7 +5,7 @@
       "setup": "sudo apt install software-properties-common -y && sudo add-apt-repository ppa:deadsnakes/ppa -y && sudo apt install python3.10 && git clone https://github.com/Compiler-Construction-Uni-Freiburg/compiler-tests && cd compiler-tests && gcc -c -g -std=c99 runtime.c",
       "run": "cd compiler-tests && python3.10 run-tests.py",
       "input": "",
-      "output": "tests: 0/3 for compiler var on language var",
+      "output": "ALL TESTS PASSED! :D",
       "comparison": "included",
       "timeout": 5,
       "points": null
