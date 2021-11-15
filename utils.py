@@ -813,6 +813,18 @@ def is_python_extension(filename):
         return False
 
 
+def ensure_final_newline(filename):
+    # check whether file is empty
+    if os.stat(filename).st_size != 0:
+        with open(filename, "r+b") as f:
+            # must open as b to seek from end; read last character
+            f.seek(-1, 2)
+            b = f.read(1)
+            newline = bytes('\n', 'utf-8')
+            if b != newline:
+                f.write(newline)
+
+
 # Given the `ast` output of a pass and a test program (root) name,
 # runs the interpreter on the program and compares the output to the
 # expected "golden" output.
@@ -826,8 +838,8 @@ def test_pass(passname, interp, program_root, ast, compiler_name):
     interp(ast)
     sys.stdin = stdin
     sys.stdout = stdout
-    os.system(sed + " -i '$a\\' " + program_root + ".out")
-    os.system(sed + " -i '$a\\' " + program_root + ".golden")
+    ensure_final_newline(program_root + '.out')
+    ensure_final_newline(program_root + '.golden')
     result = os.system("diff " + output_file + " " + program_root + ".golden")
     if result == 0:
         trace(
@@ -998,8 +1010,8 @@ def compile_and_test(
         output_file = program_root + ".out"
         os.system("./a.out < " + input_file + " > " + output_file)
 
-    os.system(sed + " -i '$a\\' " + program_root + ".out")
-    os.system(sed + " -i '$a\\' " + program_root + ".golden")
+    ensure_final_newline(program_root + '.out')
+    ensure_final_newline(program_root + '.golden')
     result = os.system("diff " + program_root + ".out " + program_root + ".golden")
     if result == 0:
         successful_passes += 1
