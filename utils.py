@@ -2,6 +2,7 @@ import os
 import sys
 from sys import platform
 import ast
+from filecmp import cmp
 from ast import *
 
 ################################################################################
@@ -825,6 +826,9 @@ def ensure_final_newline(filename):
                 f.write(newline)
 
 
+compare_files = lambda file1, file2: cmp(file1, file2, shallow=False)
+
+
 # Given the `ast` output of a pass and a test program (root) name,
 # runs the interpreter on the program and compares the output to the
 # expected "golden" output.
@@ -840,8 +844,8 @@ def test_pass(passname, interp, program_root, ast, compiler_name):
     sys.stdout = stdout
     ensure_final_newline(program_root + '.out')
     ensure_final_newline(program_root + '.golden')
-    result = os.system("diff " + output_file + " " + program_root + ".golden")
-    if result == 0:
+    result = compare_files(output_file, program_root + ".golden")
+    if result:
         trace(
             "compiler "
             + compiler_name
@@ -1012,8 +1016,8 @@ def compile_and_test(
 
     ensure_final_newline(program_root + '.out')
     ensure_final_newline(program_root + '.golden')
-    result = os.system("diff " + program_root + ".out " + program_root + ".golden")
-    if result == 0:
+    result = compare_files(program_root + ".out", program_root + ".golden")
+    if result:
         successful_passes += 1
         return (successful_passes, total_passes, 1)
     else:
